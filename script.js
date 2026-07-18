@@ -195,3 +195,5 @@ statNumbers.forEach(stat => statsObserver.observe(stat));
 
 console.log('✅ CAFCM - Site carregado com sucesso');
 console.log('✨ Scroll Spy ativo - ícones do menu brilham em amarelo na seção ativa');
+
+// Versão corrigida - 2026-07-18-17-48-21
