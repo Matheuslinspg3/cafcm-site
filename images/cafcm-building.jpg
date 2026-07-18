@@ -1,0 +1,39 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Sky -->
+  <rect width="800" height="400" fill="#87CEEB"/>
+
+  <!-- Building -->
+  <rect x="150" y="150" width="500" height="350" fill="#003366"/>
+
+  <!-- Windows -->
+  <g fill="#FDB913" opacity="0.8">
+    <!-- Floor 1 -->
+    <rect x="200" y="200" width="60" height="80"/>
+    <rect x="290" y="200" width="60" height="80"/>
+    <rect x="380" y="200" width="60" height="80"/>
+    <rect x="470" y="200" width="60" height="80"/>
+
+    <!-- Floor 2 -->
+    <rect x="200" y="310" width="60" height="80"/>
+    <rect x="290" y="310" width="60" height="80"/>
+    <rect x="380" y="310" width="60" height="80"/>
+    <rect x="470" y="310" width="60" height="80"/>
+  </g>
+
+  <!-- Entrance -->
+  <rect x="320" y="420" width="160" height="80" fill="#FDB913"/>
+
+  <!-- Logo on building -->
+  <circle cx="400" y="100" r="40" fill="#FDB913"/>
+  <text x="400" y="110" font-family="Arial" font-size="24" font-weight="bold" fill="#003366" text-anchor="middle">CAFCM</text>
+
+  <!-- Ground -->
+  <rect y="500" width="800" height="100" fill="#2F4F2F"/>
+
+  <!-- Trees -->
+  <ellipse cx="100" cy="520" rx="50" ry="60" fill="#228B22"/>
+  <rect x="90" y="530" width="20" height="70" fill="#8B4513"/>
+
+  <ellipse cx="700" cy="520" rx="50" ry="60" fill="#228B22"/>
+  <rect x="690" y="530" width="20" height="70" fill="#8B4513"/>
+</svg>

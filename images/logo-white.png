@@ -1,0 +1,10 @@
+<svg width="300" height="100" xmlns="http://www.w3.org/2000/svg">
+  <rect width="300" height="100" fill="transparent"/>
+  <circle cx="50" cy="50" r="30" fill="#FDB913"/>
+  <circle cx="40" cy="40" r="8" fill="#FFFFFF"/>
+  <circle cx="60" cy="40" r="8" fill="#FFFFFF"/>
+  <path d="M 35 60 Q 50 70 65 60" stroke="#FFFFFF" stroke-width="3" fill="none"/>
+  <text x="100" y="45" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF">CAFCM</text>
+  <text x="100" y="70" font-family="Arial, sans-serif" font-size="10" fill="#FFFFFF">Centro de Aprendizagem, Formação</text>
+  <text x="100" y="82" font-family="Arial, sans-serif" font-size="10" fill="#FFFFFF">e Convivência Metropolitana</text>
+</svg>
