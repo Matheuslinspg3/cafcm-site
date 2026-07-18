@@ -131,3 +131,5 @@ if (fileInput && fileLabel) {
 }
 
 console.log('✅ form-handler.js v4 inicializado - FUNCIONA SEM DEPENDÊNCIAS!');
+
+// Build: 1784408765
