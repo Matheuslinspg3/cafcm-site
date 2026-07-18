@@ -1,0 +1,10 @@
+{
+  "compatibility_date": "2024-01-01",
+  "compatibility_flags": [],
+  "kv_namespaces": [
+    {
+      "binding": "CAFCM_DATA",
+      "id": "NAMESPACE_ID_AQUI"
+    }
+  ]
+}
