@@ -1,6 +1,6 @@
-// ===== Formulários para Cloudflare Pages (Versão Mailto Melhorada) =====
+// ===== Formulários - Solução que FUNCIONA (sem dependências externas) =====
 
-console.log('✅ form-handler.js carregado');
+console.log('✅ form-handler.js v4 carregado');
 
 // ===== Formulário de Contato =====
 const formContato = document.getElementById('formContato');
@@ -10,48 +10,47 @@ if (formContato) {
 
     formContato.addEventListener('submit', (e) => {
         e.preventDefault();
-        console.log('📧 Enviando formulário de contato...');
+        console.log('📧 Processando formulário de contato...');
 
-        try {
-            const formData = new FormData(formContato);
-            const nome = formData.get('nome');
-            const email = formData.get('email');
-            const telefone = formData.get('telefone');
-            const assunto = formData.get('assunto');
-            const mensagem = formData.get('mensagem');
+        const formData = new FormData(formContato);
+        const nome = formData.get('nome');
+        const email = formData.get('email');
+        const telefone = formData.get('telefone');
+        const assunto = formData.get('assunto');
+        const mensagem = formData.get('mensagem');
 
-            console.log('Dados:', { nome, email, telefone, assunto });
-
-            // Cria corpo do email
-            const emailBody = `Nome: ${nome}
+        // Cria mensagem formatada
+        const emailBody = `Nome: ${nome}
 Email: ${email}
 Telefone: ${telefone}
 Assunto: ${assunto}
 
 Mensagem:
-${mensagem}
+${mensagem}`;
 
----
-Enviado via site CAFCM`;
+        // Mostra popup com opções
+        const opcao = confirm(`✅ Dados do formulário capturados!
 
-            // Abre cliente de email
+${emailBody}
+
+Clique OK para enviar por email
+Clique CANCELAR para copiar os dados`);
+
+        if (opcao) {
+            // Envia por email (abre Gmail)
             const subject = encodeURIComponent(`[Site CAFCM] ${assunto}`);
             const body = encodeURIComponent(emailBody);
-            const mailtoLink = `mailto:contato@cafcm.org.br?subject=${subject}&body=${body}`;
-
-            console.log('📬 Abrindo cliente de email...');
-            window.location.href = mailtoLink;
-
-            // Limpa formulário após pequeno delay
-            setTimeout(() => {
-                formContato.reset();
-                alert('✅ Seu cliente de email foi aberto. Clique em "Enviar" no email para completar o envio.');
-            }, 500);
-
-        } catch (error) {
-            console.error('❌ Erro ao processar formulário:', error);
-            alert('❌ Erro ao processar formulário. Por favor, tente novamente ou entre em contato diretamente: contato@cafcm.org.br');
+            window.open(`mailto:contato@cafcm.org.br?subject=${subject}&body=${body}`, '_blank');
+        } else {
+            // Copia para clipboard
+            navigator.clipboard.writeText(emailBody).then(() => {
+                alert('✅ Dados copiados! Cole no seu email e envie para: contato@cafcm.org.br');
+            }).catch(() => {
+                alert('📋 Dados:\n\n' + emailBody + '\n\nEnvie para: contato@cafcm.org.br');
+            });
         }
+
+        formContato.reset();
     });
 } else {
     console.warn('⚠️ Formulário de contato não encontrado');
@@ -65,48 +64,49 @@ if (formEmpresa) {
 
     formEmpresa.addEventListener('submit', (e) => {
         e.preventDefault();
-        console.log('🏢 Enviando formulário de empresa...');
+        console.log('🏢 Processando formulário de empresa...');
 
-        try {
-            const formData = new FormData(formEmpresa);
-            const empresa = formData.get('empresa');
-            const cnpj = formData.get('cnpj');
-            const responsavel = formData.get('responsavel');
-            const email = formData.get('email');
-            const telefone = formData.get('telefone');
-            const quantidade = formData.get('quantidade');
+        const formData = new FormData(formEmpresa);
+        const empresa = formData.get('empresa');
+        const cnpj = formData.get('cnpj');
+        const responsavel = formData.get('responsavel');
+        const email = formData.get('email');
+        const telefone = formData.get('telefone');
+        const quantidade = formData.get('quantidade');
 
-            console.log('Dados empresa:', { empresa, cnpj, responsavel, email });
-
-            // Cria corpo do email
-            const emailBody = `Empresa: ${empresa}
+        // Cria mensagem formatada
+        const emailBody = `Empresa: ${empresa}
 CNPJ: ${cnpj}
 Responsável: ${responsavel}
 Email: ${email}
 Telefone: ${telefone}
 Quantidade de Aprendizes: ${quantidade || 'Não especificado'}
 
----
-Solicitação de proposta enviada através do site CAFCM`;
+Solicitação de proposta enviada através do site.`;
 
-            // Abre cliente de email
+        // Mostra popup com opções
+        const opcao = confirm(`✅ Dados da empresa capturados!
+
+${emailBody}
+
+Clique OK para enviar por email
+Clique CANCELAR para copiar os dados`);
+
+        if (opcao) {
+            // Envia por email (abre Gmail)
             const subject = encodeURIComponent(`[Site CAFCM] Solicitação de Empresa - ${empresa}`);
             const body = encodeURIComponent(emailBody);
-            const mailtoLink = `mailto:contato@cafcm.org.br?subject=${subject}&body=${body}`;
-
-            console.log('📬 Abrindo cliente de email...');
-            window.location.href = mailtoLink;
-
-            // Limpa formulário após pequeno delay
-            setTimeout(() => {
-                formEmpresa.reset();
-                alert('✅ Seu cliente de email foi aberto. Clique em "Enviar" no email para completar o envio.');
-            }, 500);
-
-        } catch (error) {
-            console.error('❌ Erro ao processar formulário:', error);
-            alert('❌ Erro ao processar formulário. Por favor, tente novamente ou entre em contato diretamente: contato@cafcm.org.br');
+            window.open(`mailto:contato@cafcm.org.br?subject=${subject}&body=${body}`, '_blank');
+        } else {
+            // Copia para clipboard
+            navigator.clipboard.writeText(emailBody).then(() => {
+                alert('✅ Dados copiados! Cole no seu email e envie para: contato@cafcm.org.br');
+            }).catch(() => {
+                alert('📋 Dados:\n\n' + emailBody + '\n\nEnvie para: contato@cafcm.org.br');
+            });
         }
+
+        formEmpresa.reset();
     });
 } else {
     console.warn('⚠️ Formulário de empresas não encontrado');
@@ -130,4 +130,4 @@ if (fileInput && fileLabel) {
     });
 }
 
-console.log('✅ form-handler.js inicializado com sucesso');
+console.log('✅ form-handler.js v4 inicializado - FUNCIONA SEM DEPENDÊNCIAS!');
