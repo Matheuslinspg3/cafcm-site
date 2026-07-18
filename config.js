@@ -17,7 +17,7 @@ const CAFCM_CONFIG = {
     linkedin: 'https://linkedin.com/company/cafcm',
 
     // Web3Forms (para envio automático de emails)
-    web3formsKey: 'YOUR-ACCESS-KEY-HERE' // Obtenha em: https://web3forms.com/
+    web3formsKey: '7f882fd6-5913-4ad2-a1e3-7a12b781bd1d' // Configurado!
 };
 
 // ===== NÃO EDITE ABAIXO DESTA LINHA =====
