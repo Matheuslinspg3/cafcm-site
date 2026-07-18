@@ -80,93 +80,9 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// ===== Formulário de Contato =====
-const formContato = document.getElementById('formContato');
+// ===== FIM DO SCRIPT =====
+// Formulários gerenciados por form-handler.js
 
-if (formContato) {
-    formContato.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const formData = new FormData(formContato);
-        const submitBtn = formContato.querySelector('button[type="submit"]');
-
-        // Desabilita botão durante envio
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-
-        try {
-            const response = await fetch('/api/contact', {
-                method: 'POST',
-                body: formData
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                alert('✅ ' + data.message);
-                formContato.reset();
-
-                // Atualiza label do arquivo
-                const fileLabel = document.querySelector('.form-file label');
-                if (fileLabel) {
-                    fileLabel.innerHTML = '<i class="fas fa-paperclip"></i> Anexar Currículo (opcional)';
-                }
-            } else {
-                alert('❌ Erro: ' + data.error);
-            }
-        } catch (error) {
-            console.error('Erro ao enviar:', error);
-            alert('❌ Erro ao enviar mensagem. Tente novamente.');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Mensagem';
-        }
-    });
-}
-
-// ===== Formulário Empresas =====
-const formEmpresa = document.getElementById('formEmpresa');
-
-if (formEmpresa) {
-    formEmpresa.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const formData = new FormData(formEmpresa);
-        const data = Object.fromEntries(formData.entries());
-        const submitBtn = formEmpresa.querySelector('button[type="submit"]');
-
-        // Desabilita botão durante envio
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-
-        try {
-            const response = await fetch('/api/empresa-contact', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                alert('✅ ' + result.message);
-                formEmpresa.reset();
-            } else {
-                alert('❌ Erro: ' + result.error);
-            }
-        } catch (error) {
-            console.error('Erro ao enviar:', error);
-            alert('❌ Erro ao enviar solicitação. Tente novamente.');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Solicitação';
-        }
-    });
-}
-
-// ===== Atualiza nome do arquivo selecionado =====
-const fileInput = document.getElementById('curriculo');
-const fileLabel = document.querySelector('.form-file label');
 
 if (fileInput && fileLabel) {
     fileInput.addEventListener('change', function() {
