@@ -83,18 +83,6 @@ window.addEventListener('scroll', () => {
 // ===== FIM DO SCRIPT =====
 // Formulários gerenciados por form-handler.js
 
-
-if (fileInput && fileLabel) {
-    fileInput.addEventListener('change', function() {
-        if (this.files && this.files.length > 0) {
-            const fileName = this.files[0].name;
-            fileLabel.innerHTML = `<i class="fas fa-check-circle"></i> ${fileName}`;
-        } else {
-            fileLabel.innerHTML = '<i class="fas fa-paperclip"></i> Anexar Currículo (opcional)';
-        }
-    });
-}
-
 // ===== Máscaras de Input (básicas) =====
 const telefoneInputs = document.querySelectorAll('input[name="telefone"]');
 
