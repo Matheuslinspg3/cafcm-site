@@ -48,6 +48,7 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            text-decoration: none;
         }
 
         .edit-btn:hover {
@@ -72,42 +73,45 @@
         }
 
         /* Elementos editáveis */
-        [contenteditable="true"] {
-            outline: 2px dashed #667eea;
+        [data-editable] {
+            outline: 2px dashed #667eea !important;
             outline-offset: 4px;
             padding: 8px;
             transition: all 0.3s;
             position: relative;
             cursor: text;
+            min-height: 30px;
         }
 
-        [contenteditable="true"]:hover {
-            outline-color: #764ba2;
-            background: rgba(102, 126, 234, 0.05);
+        [data-editable]:hover {
+            outline-color: #764ba2 !important;
+            background: rgba(102, 126, 234, 0.05) !important;
         }
 
-        [contenteditable="true"]:focus {
-            outline: 3px solid #667eea;
-            background: rgba(102, 126, 234, 0.1);
+        [data-editable]:focus {
+            outline: 3px solid #667eea !important;
+            background: rgba(102, 126, 234, 0.1) !important;
         }
 
-        /* Badge de edição */
-        .edit-badge {
+        [data-editable]::before {
+            content: "✏️ Clique para editar";
             position: absolute;
-            top: -10px;
-            right: -10px;
+            top: -25px;
+            left: 0;
             background: #667eea;
             color: white;
-            font-size: 10px;
-            padding: 4px 8px;
+            font-size: 11px;
+            padding: 4px 10px;
             border-radius: 4px;
             font-weight: bold;
-            pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 100;
         }
 
-        [contenteditable="true"]:hover .edit-badge {
+        [data-editable]:hover::before {
             opacity: 1;
         }
 
@@ -145,6 +149,33 @@
                 transform: translateX(0);
                 opacity: 1;
             }
+        }
+
+        /* Edição de imagem */
+        .image-edit-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        [data-editable-image] {
+            position: relative;
+            outline: 2px dashed #667eea !important;
+            outline-offset: 4px;
+            cursor: pointer;
+        }
+
+        [data-editable-image]:hover .image-edit-overlay {
+            display: flex;
         }
 
         @media (max-width: 768px) {
@@ -196,30 +227,27 @@
         <span id="toastMessage">Salvo com sucesso!</span>
     </div>
 
-    <!-- Conteúdo da Página (copiado do index.html) -->
-    <div id="pageContent">
-        <!-- O conteúdo será carregado aqui -->
-    </div>
+    <!-- Conteúdo da Página -->
+    <div id="pageContent"></div>
 
     <script>
-        // Carrega o conteúdo do index.html
+        let conteudoOriginal = {};
+
         async function carregarPagina() {
             try {
                 const response = await fetch('/index.html');
                 const html = await response.text();
 
-                // Extrai apenas o body
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                const body = doc.body.innerHTML;
 
-                document.getElementById('pageContent').innerHTML = body;
+                document.getElementById('pageContent').innerHTML = doc.body.innerHTML;
 
-                // Carrega conteúdo salvo do KV
+                // Carrega conteúdo salvo
                 await carregarConteudoSalvo();
 
                 // Torna elementos editáveis
-                tornarEditavel();
+                setTimeout(tornarEditavel, 500);
 
             } catch (error) {
                 console.error('Erro ao carregar página:', error);
@@ -232,26 +260,45 @@
                 if (!response.ok) return;
 
                 const content = await response.json();
+                conteudoOriginal = content;
 
-                // Aplica conteúdo salvo (se existir)
+                // Hero Section
                 if (content.hero_titulo1) {
-                    const heroTitulo = document.querySelector('.hero-section h1');
-                    if (heroTitulo) {
-                        // Substitui as linhas do título
-                        const lines = heroTitulo.innerHTML.split('<br>');
-                        if (lines.length >= 3) {
-                            heroTitulo.innerHTML = `
-                                ${content.hero_titulo1}<br>
-                                <span class="highlight">${content.hero_titulo2}</span><br>
-                                ${content.hero_titulo3}
-                            `;
-                        }
+                    const lines = [content.hero_titulo1, content.hero_titulo2, content.hero_titulo3];
+                    const heroTitle = document.querySelector('.hero-content h1');
+                    if (heroTitle) {
+                        heroTitle.innerHTML = `
+                            ${lines[0]}<br>
+                            <span class="highlight">${lines[1]}</span><br>
+                            ${lines[2]}
+                        `;
                     }
                 }
 
                 if (content.hero_descricao) {
-                    const heroDesc = document.querySelector('.hero-section p');
+                    const heroDesc = document.querySelector('.hero-content p');
                     if (heroDesc) heroDesc.textContent = content.hero_descricao;
+                }
+
+                if (content.hero_imagem) {
+                    const heroImg = document.querySelector('.hero-image img');
+                    if (heroImg) heroImg.src = content.hero_imagem;
+                }
+
+                // Quem Somos
+                if (content.quem_somos_label) {
+                    const label = document.querySelector('#institucional .section-label');
+                    if (label) label.textContent = content.quem_somos_label;
+                }
+
+                if (content.quem_somos_titulo) {
+                    const titulo = document.querySelector('#institucional .section-title');
+                    if (titulo) titulo.textContent = content.quem_somos_titulo;
+                }
+
+                if (content.quem_somos_subtitulo) {
+                    const subtitulo = document.querySelector('#institucional .section-subtitle');
+                    if (subtitulo) subtitulo.textContent = content.quem_somos_subtitulo;
                 }
 
             } catch (error) {
@@ -260,38 +307,67 @@
         }
 
         function tornarEditavel() {
-            // Hero section
-            const heroTitle = document.querySelector('.hero-section h1');
+            // Hero Section - Título
+            const heroTitle = document.querySelector('.hero-content h1');
             if (heroTitle) {
                 heroTitle.contentEditable = true;
-                heroTitle.dataset.field = 'hero_titulo';
+                heroTitle.setAttribute('data-editable', 'hero-titulo');
             }
 
-            const heroDesc = document.querySelector('.hero-section p');
+            // Hero Section - Descrição
+            const heroDesc = document.querySelector('.hero-content > p');
             if (heroDesc) {
                 heroDesc.contentEditable = true;
-                heroDesc.dataset.field = 'hero_descricao';
+                heroDesc.setAttribute('data-editable', 'hero-descricao');
             }
 
-            // Seção Institucional
-            const instTitle = document.querySelector('#institucional h2');
-            if (instTitle) {
-                instTitle.contentEditable = true;
-                instTitle.dataset.field = 'inst_titulo';
+            // Hero Section - Imagem
+            const heroImgWrapper = document.querySelector('.hero-image .image-wrapper');
+            if (heroImgWrapper) {
+                heroImgWrapper.setAttribute('data-editable-image', 'hero-imagem');
+                heroImgWrapper.style.position = 'relative';
+
+                const overlay = document.createElement('div');
+                overlay.className = 'image-edit-overlay';
+                overlay.innerHTML = '<div><i class="fas fa-image"></i> Clique para trocar imagem</div>';
+                heroImgWrapper.appendChild(overlay);
+
+                heroImgWrapper.addEventListener('click', () => {
+                    const newUrl = prompt('Cole a URL da nova imagem:',
+                        document.querySelector('.hero-image img')?.src || '');
+                    if (newUrl) {
+                        const img = document.querySelector('.hero-image img');
+                        if (img) img.src = newUrl;
+                    }
+                });
             }
 
-            const instSubtitle = document.querySelector('#institucional .section-subtitle');
-            if (instSubtitle) {
-                instSubtitle.contentEditable = true;
-                instSubtitle.dataset.field = 'inst_subtitulo';
+            // Seção QUEM SOMOS - Label
+            const quemsomosLabel = document.querySelector('#institucional .section-label');
+            if (quemsomosLabel) {
+                quemsomosLabel.contentEditable = true;
+                quemsomosLabel.setAttribute('data-editable', 'quem-somos-label');
             }
 
-            const instDesc = document.querySelectorAll('#institucional p');
-            instDesc.forEach((p, index) => {
-                if (p.className !== 'section-subtitle') {
-                    p.contentEditable = true;
-                    p.dataset.field = `inst_descricao_${index}`;
-                }
+            // Seção QUEM SOMOS - Título
+            const quemsomosTitle = document.querySelector('#institucional .section-title');
+            if (quemsomosTitle) {
+                quemsomosTitle.contentEditable = true;
+                quemsomosTitle.setAttribute('data-editable', 'quem-somos-titulo');
+            }
+
+            // Seção QUEM SOMOS - Subtítulo
+            const quemsomosSubtitle = document.querySelector('#institucional .section-subtitle');
+            if (quemsomosSubtitle) {
+                quemsomosSubtitle.contentEditable = true;
+                quemsomosSubtitle.setAttribute('data-editable', 'quem-somos-subtitulo');
+            }
+
+            // Seção QUEM SOMOS - Conteúdo (h3 e p)
+            const institucionalContent = document.querySelectorAll('.institucional-content h3, .institucional-content > p');
+            institucionalContent.forEach((el, index) => {
+                el.contentEditable = true;
+                el.setAttribute('data-editable', `quem-somos-content-${index}`);
             });
         }
 
@@ -302,10 +378,11 @@
 
             try {
                 // Coleta dados editados
-                const heroTitle = document.querySelector('.hero-section h1');
-                const heroDesc = document.querySelector('.hero-section p');
+                const heroTitle = document.querySelector('.hero-content h1');
+                const heroDesc = document.querySelector('.hero-content > p');
+                const heroImg = document.querySelector('.hero-image img');
 
-                // Extrai as 3 linhas do título
+                // Extrai as 3 linhas do título Hero
                 let titulo1 = '', titulo2 = '', titulo3 = '';
                 if (heroTitle) {
                     const html = heroTitle.innerHTML;
@@ -315,14 +392,22 @@
                     titulo3 = parts[2]?.replace(/<[^>]*>/g, '').trim() || '';
                 }
 
+                // Coleta conteúdo Quem Somos
+                const quemsomosContent = {};
+                document.querySelectorAll('.institucional-content h3, .institucional-content > p').forEach((el, index) => {
+                    quemsomosContent[`content_${index}`] = el.innerHTML;
+                });
+
                 const content = {
                     hero_titulo1: titulo1,
                     hero_titulo2: titulo2,
                     hero_titulo3: titulo3,
                     hero_descricao: heroDesc?.textContent || '',
-                    inst_titulo: document.querySelector('#institucional h2')?.textContent || '',
-                    inst_subtitulo: document.querySelector('#institucional .section-subtitle')?.textContent || '',
-                    inst_descricao: ''
+                    hero_imagem: heroImg?.src || '',
+                    quem_somos_label: document.querySelector('#institucional .section-label')?.textContent || '',
+                    quem_somos_titulo: document.querySelector('#institucional .section-title')?.textContent || '',
+                    quem_somos_subtitulo: document.querySelector('#institucional .section-subtitle')?.textContent || '',
+                    quem_somos_content: quemsomosContent
                 };
 
                 // Salva no KV
@@ -338,7 +423,7 @@
 
             } catch (error) {
                 console.error('Erro:', error);
-                mostrarToast('❌ Erro ao salvar alterações', 'error');
+                mostrarToast('❌ Erro ao salvar alterações. Funciona apenas online!', 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-save"></i> Salvar Alterações';
