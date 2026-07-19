@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAFCM - Modo Edição</title>
+    <link rel="stylesheet" href="styles.css?v=4">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Barra superior de edição */
+        .edit-toolbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            z-index: 10000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+
+        .edit-toolbar h1 {
+            font-size: 18px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .edit-toolbar-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .edit-btn:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        .edit-btn-success {
+            background: #28a745;
+            border-color: #28a745;
+        }
+
+        .edit-btn-success:hover {
+            background: #218838;
+            border-color: #218838;
+            color: white;
+        }
+
+        /* Ajusta body para compensar toolbar */
+        body {
+            padding-top: 70px !important;
+        }
+
+        /* Elementos editáveis */
+        [contenteditable="true"] {
+            outline: 2px dashed #667eea;
+            outline-offset: 4px;
+            padding: 8px;
+            transition: all 0.3s;
+            position: relative;
+            cursor: text;
+        }
+
+        [contenteditable="true"]:hover {
+            outline-color: #764ba2;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        [contenteditable="true"]:focus {
+            outline: 3px solid #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        /* Badge de edição */
+        .edit-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #667eea;
+            color: white;
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        [contenteditable="true"]:hover .edit-badge {
+            opacity: 1;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #28a745;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 10001;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s;
+        }
+
+        .toast.show {
+            display: flex;
+        }
+
+        .toast.error {
+            background: #dc3545;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .edit-toolbar {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .edit-toolbar h1 {
+                font-size: 16px;
+            }
+
+            .edit-toolbar-buttons {
+                width: 100%;
+            }
+
+            .edit-btn {
+                flex: 1;
+                justify-content: center;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de Edição -->
+    <div class="edit-toolbar">
+        <h1>
+            <i class="fas fa-edit"></i>
+            Modo Edição - Clique nos textos para editar
+        </h1>
+        <div class="edit-toolbar-buttons">
+            <button class="edit-btn edit-btn-success" onclick="salvarAlteracoes()">
+                <i class="fas fa-save"></i>
+                Salvar Alterações
+            </button>
+            <a href="/admin.html" class="edit-btn">
+                <i class="fas fa-times"></i>
+                Sair
+            </a>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Salvo com sucesso!</span>
+    </div>
+
+    <!-- Conteúdo da Página (copiado do index.html) -->
+    <div id="pageContent">
+        <!-- O conteúdo será carregado aqui -->
+    </div>
+
+    <script>
+        // Carrega o conteúdo do index.html
+        async function carregarPagina() {
+            try {
+                const response = await fetch('/index.html');
+                const html = await response.text();
+
+                // Extrai apenas o body
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const body = doc.body.innerHTML;
+
+                document.getElementById('pageContent').innerHTML = body;
+
+                // Carrega conteúdo salvo do KV
+                await carregarConteudoSalvo();
+
+                // Torna elementos editáveis
+                tornarEditavel();
+
+            } catch (error) {
+                console.error('Erro ao carregar página:', error);
+            }
+        }
+
+        async function carregarConteudoSalvo() {
+            try {
+                const response = await fetch('/api/content');
+                if (!response.ok) return;
+
+                const content = await response.json();
+
+                // Aplica conteúdo salvo (se existir)
+                if (content.hero_titulo1) {
+                    const heroTitulo = document.querySelector('.hero-section h1');
+                    if (heroTitulo) {
+                        // Substitui as linhas do título
+                        const lines = heroTitulo.innerHTML.split('<br>');
+                        if (lines.length >= 3) {
+                            heroTitulo.innerHTML = `
+                                ${content.hero_titulo1}<br>
+                                <span class="highlight">${content.hero_titulo2}</span><br>
+                                ${content.hero_titulo3}
+                            `;
+                        }
+                    }
+                }
+
+                if (content.hero_descricao) {
+                    const heroDesc = document.querySelector('.hero-section p');
+                    if (heroDesc) heroDesc.textContent = content.hero_descricao;
+                }
+
+            } catch (error) {
+                console.log('Nenhum conteúdo salvo ainda');
+            }
+        }
+
+        function tornarEditavel() {
+            // Hero section
+            const heroTitle = document.querySelector('.hero-section h1');
+            if (heroTitle) {
+                heroTitle.contentEditable = true;
+                heroTitle.dataset.field = 'hero_titulo';
+            }
+
+            const heroDesc = document.querySelector('.hero-section p');
+            if (heroDesc) {
+                heroDesc.contentEditable = true;
+                heroDesc.dataset.field = 'hero_descricao';
+            }
+
+            // Seção Institucional
+            const instTitle = document.querySelector('#institucional h2');
+            if (instTitle) {
+                instTitle.contentEditable = true;
+                instTitle.dataset.field = 'inst_titulo';
+            }
+
+            const instSubtitle = document.querySelector('#institucional .section-subtitle');
+            if (instSubtitle) {
+                instSubtitle.contentEditable = true;
+                instSubtitle.dataset.field = 'inst_subtitulo';
+            }
+
+            const instDesc = document.querySelectorAll('#institucional p');
+            instDesc.forEach((p, index) => {
+                if (p.className !== 'section-subtitle') {
+                    p.contentEditable = true;
+                    p.dataset.field = `inst_descricao_${index}`;
+                }
+            });
+        }
+
+        async function salvarAlteracoes() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+
+            try {
+                // Coleta dados editados
+                const heroTitle = document.querySelector('.hero-section h1');
+                const heroDesc = document.querySelector('.hero-section p');
+
+                // Extrai as 3 linhas do título
+                let titulo1 = '', titulo2 = '', titulo3 = '';
+                if (heroTitle) {
+                    const html = heroTitle.innerHTML;
+                    const parts = html.split('<br>');
+                    titulo1 = parts[0]?.replace(/<[^>]*>/g, '').trim() || '';
+                    titulo2 = parts[1]?.replace(/<[^>]*>/g, '').trim() || '';
+                    titulo3 = parts[2]?.replace(/<[^>]*>/g, '').trim() || '';
+                }
+
+                const content = {
+                    hero_titulo1: titulo1,
+                    hero_titulo2: titulo2,
+                    hero_titulo3: titulo3,
+                    hero_descricao: heroDesc?.textContent || '',
+                    inst_titulo: document.querySelector('#institucional h2')?.textContent || '',
+                    inst_subtitulo: document.querySelector('#institucional .section-subtitle')?.textContent || '',
+                    inst_descricao: ''
+                };
+
+                // Salva no KV
+                const response = await fetch('/api/content', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(content)
+                });
+
+                if (!response.ok) throw new Error('Erro ao salvar');
+
+                mostrarToast('✅ Alterações salvas com sucesso!', 'success');
+
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarToast('❌ Erro ao salvar alterações', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> Salvar Alterações';
+            }
+        }
+
+        function mostrarToast(mensagem, tipo) {
+            const toast = document.getElementById('toast');
+            const message = document.getElementById('toastMessage');
+
+            message.textContent = mensagem;
+            toast.className = `toast ${tipo} show`;
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Carrega página ao iniciar
+        window.addEventListener('DOMContentLoaded', carregarPagina);
+    </script>
+</body>
+</html>
