@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAFCM - Notícias</title>
+    <meta name="description" content="Fique por dentro das últimas notícias e novidades da CAFCM.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a5490 0%, #2980b9 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .btn-voltar {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+
+        .btn-voltar:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Grid de Notícias */
+        .noticias-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .noticia-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .noticia-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .noticia-imagem {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+        }
+
+        .noticia-imagem img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .noticia-conteudo {
+            padding: 25px;
+        }
+
+        .noticia-data {
+            color: #1a5490;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .noticia-titulo {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a5490;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .noticia-resumo {
+            color: #666;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .noticia-link {
+            color: #1a5490;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: gap 0.3s;
+        }
+
+        .noticia-link:hover {
+            gap: 10px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 800px;
+            width: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: auto;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-imagem {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 64px;
+        }
+
+        .modal-imagem img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-body {
+            padding: 40px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 20px;
+        }
+
+        .modal-titulo {
+            font-size: 28px;
+            color: #1a5490;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 32px;
+            color: #666;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .close-modal:hover {
+            background: #f0f0f0;
+        }
+
+        .modal-data {
+            color: #1a5490;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-texto {
+            color: #444;
+            font-size: 16px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
+        /* Estado vazio */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .noticias-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .modal-body {
+                padding: 25px;
+            }
+
+            .modal-titulo {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>
+            <i class="fas fa-newspaper"></i>
+            Notícias CAFCM
+        </h1>
+        <p>Fique por dentro das últimas novidades</p>
+        <a href="/" class="btn-voltar">
+            <i class="fas fa-arrow-left"></i>
+            Voltar ao Site
+        </a>
+    </div>
+
+    <div class="container">
+        <div id="noticiasContainer">
+            <!-- Notícias serão carregadas aqui -->
+        </div>
+    </div>
+
+    <!-- Modal Notícia Completa -->
+    <div id="modalNoticia" class="modal" onclick="fecharModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div id="modalImagemContainer"></div>
+            <div class="modal-body">
+                <div class="modal-header">
+                    <h2 id="modalTitulo" class="modal-titulo"></h2>
+                    <button class="close-modal" onclick="fecharModal()">×</button>
+                </div>
+                <div id="modalData" class="modal-data"></div>
+                <div id="modalTexto" class="modal-texto"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let noticias = [];
+
+        // Carrega notícias
+        window.addEventListener('DOMContentLoaded', carregarNoticias);
+
+        async function carregarNoticias() {
+            try {
+                const response = await fetch('/api/noticias');
+                const data = await response.json();
+                noticias = data.noticias || [];
+                renderizarNoticias();
+            } catch (error) {
+                console.error('Erro ao carregar notícias:', error);
+                mostrarEstadoVazio();
+            }
+        }
+
+        function renderizarNoticias() {
+            const container = document.getElementById('noticiasContainer');
+
+            if (noticias.length === 0) {
+                mostrarEstadoVazio();
+                return;
+            }
+
+            // Ordena por data (mais recente primeiro)
+            noticias.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+            container.innerHTML = `
+                <div class="noticias-grid">
+                    ${noticias.map(noticia => `
+                        <div class="noticia-card" onclick="abrirNoticia('${noticia.id}')">
+                            <div class="noticia-imagem">
+                                ${noticia.imagem
+                                    ? `<img src="${noticia.imagem}" alt="${noticia.titulo}">`
+                                    : '<i class="fas fa-newspaper"></i>'}
+                            </div>
+                            <div class="noticia-conteudo">
+                                <div class="noticia-data">
+                                    <i class="fas fa-calendar"></i>
+                                    ${new Date(noticia.data).toLocaleDateString('pt-BR', {
+                                        day: '2-digit',
+                                        month: 'long',
+                                        year: 'numeric'
+                                    })}
+                                </div>
+                                <h2 class="noticia-titulo">${noticia.titulo}</h2>
+                                <p class="noticia-resumo">${noticia.resumo}</p>
+                                <a class="noticia-link">
+                                    Ler mais <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function mostrarEstadoVazio() {
+            const container = document.getElementById('noticiasContainer');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-newspaper"></i>
+                    <h2>Nenhuma notícia publicada ainda</h2>
+                    <p>Em breve você encontrará as últimas novidades da CAFCM aqui.</p>
+                </div>
+            `;
+        }
+
+        function abrirNoticia(id) {
+            const noticia = noticias.find(n => n.id === id);
+            if (!noticia) return;
+
+            // Preenche modal
+            document.getElementById('modalTitulo').textContent = noticia.titulo;
+            document.getElementById('modalData').innerHTML = `
+                <i class="fas fa-calendar"></i>
+                ${new Date(noticia.data).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                })}
+            `;
+            document.getElementById('modalTexto').textContent = noticia.conteudo;
+
+            // Imagem
+            const imagemContainer = document.getElementById('modalImagemContainer');
+            if (noticia.imagem) {
+                imagemContainer.innerHTML = `
+                    <div class="modal-imagem">
+                        <img src="${noticia.imagem}" alt="${noticia.titulo}">
+                    </div>
+                `;
+            } else {
+                imagemContainer.innerHTML = `
+                    <div class="modal-imagem">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
+                `;
+            }
+
+            // Mostra modal
+            document.getElementById('modalNoticia').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function fecharModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('modalNoticia').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Fecha modal com ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') fecharModal();
+        });
+    </script>
+</body>
+</html>

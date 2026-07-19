@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAFCM - Gerenciar Notícias</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        h1 {
+            color: #1a5490;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background: #1a5490;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: #144070;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 12px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #1a5490;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .status {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .news-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .news-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #eee;
+            transition: all 0.3s;
+        }
+
+        .news-item:hover {
+            border-color: #1a5490;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .news-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .news-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1a5490;
+            margin-bottom: 5px;
+        }
+
+        .news-date {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .news-excerpt {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .news-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #1a5490;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-buttons {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-newspaper"></i>
+                Gerenciar Notícias
+            </h1>
+            <div class="nav-buttons">
+                <button class="btn btn-success" onclick="abrirModalNova()">
+                    <i class="fas fa-plus"></i> Nova Notícia
+                </button>
+                <a href="/admin.html" class="btn btn-secondary">
+                    <i class="fas fa-cog"></i> Configurações
+                </a>
+                <a href="/admin-editor.html" class="btn btn-secondary">
+                    <i class="fas fa-edit"></i> Editor
+                </a>
+            </div>
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <div id="newsList" class="news-list">
+            <!-- Notícias serão carregadas aqui -->
+        </div>
+    </div>
+
+    <!-- Modal Nova/Editar Notícia -->
+    <div id="modalNoticia" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nova Notícia</h2>
+                <button class="close-modal" onclick="fecharModal()">×</button>
+            </div>
+
+            <form id="formNoticia" onsubmit="salvarNoticia(event)">
+                <input type="hidden" id="noticiaId">
+
+                <div class="form-group">
+                    <label for="titulo">Título da Notícia</label>
+                    <input type="text" id="titulo" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="resumo">Resumo/Chamada</label>
+                    <textarea id="resumo" rows="3" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="conteudo">Conteúdo Completo</label>
+                    <textarea id="conteudo" rows="10" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="imagem">URL da Imagem (opcional)</label>
+                    <input type="url" id="imagem" placeholder="https://...">
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Salvar Notícia
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="fecharModal()">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let noticias = [];
+        let editandoId = null;
+
+        // Carrega notícias ao abrir
+        window.addEventListener('DOMContentLoaded', carregarNoticias);
+
+        async function carregarNoticias() {
+            try {
+                const response = await fetch('/api/noticias');
+
+                if (response.ok) {
+                    const data = await response.json();
+                    noticias = data.noticias || [];
+                } else {
+                    noticias = [];
+                }
+
+                renderizarNoticias();
+            } catch (error) {
+                console.error('Erro ao carregar notícias:', error);
+                noticias = [];
+                renderizarNoticias();
+            }
+        }
+
+        function renderizarNoticias() {
+            const lista = document.getElementById('newsList');
+
+            if (noticias.length === 0) {
+                lista.innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; color: #666;">
+                        <i class="fas fa-newspaper" style="font-size: 48px; margin-bottom: 20px; opacity: 0.3;"></i>
+                        <p style="font-size: 18px;">Nenhuma notícia publicada ainda.</p>
+                        <p style="font-size: 14px; margin-top: 10px;">Clique em "Nova Notícia" para começar.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Ordena por data (mais recente primeiro)
+            noticias.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+            lista.innerHTML = noticias.map(noticia => `
+                <div class="news-item">
+                    <div class="news-header">
+                        <div>
+                            <div class="news-title">${noticia.titulo}</div>
+                            <div class="news-date">
+                                <i class="fas fa-calendar"></i>
+                                ${new Date(noticia.data).toLocaleDateString('pt-BR')}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="news-excerpt">${noticia.resumo}</div>
+                    <div class="news-actions">
+                        <button class="btn btn-small btn-secondary" onclick="editarNoticia('${noticia.id}')">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="deletarNoticia('${noticia.id}')">
+                            <i class="fas fa-trash"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function abrirModalNova() {
+            editandoId = null;
+            document.getElementById('modalTitle').textContent = 'Nova Notícia';
+            document.getElementById('formNoticia').reset();
+            document.getElementById('noticiaId').value = '';
+            document.getElementById('modalNoticia').classList.add('show');
+        }
+
+        function editarNoticia(id) {
+            const noticia = noticias.find(n => n.id === id);
+            if (!noticia) return;
+
+            editandoId = id;
+            document.getElementById('modalTitle').textContent = 'Editar Notícia';
+            document.getElementById('noticiaId').value = id;
+            document.getElementById('titulo').value = noticia.titulo;
+            document.getElementById('resumo').value = noticia.resumo;
+            document.getElementById('conteudo').value = noticia.conteudo;
+            document.getElementById('imagem').value = noticia.imagem || '';
+            document.getElementById('modalNoticia').classList.add('show');
+        }
+
+        function fecharModal() {
+            document.getElementById('modalNoticia').classList.remove('show');
+        }
+
+        async function salvarNoticia(event) {
+            event.preventDefault();
+
+            const btn = event.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+
+            try {
+                const noticia = {
+                    id: editandoId || Date.now().toString(),
+                    titulo: document.getElementById('titulo').value,
+                    resumo: document.getElementById('resumo').value,
+                    conteudo: document.getElementById('conteudo').value,
+                    imagem: document.getElementById('imagem').value,
+                    data: editandoId
+                        ? noticias.find(n => n.id === editandoId).data
+                        : new Date().toISOString()
+                };
+
+                if (editandoId) {
+                    // Atualiza existente
+                    const index = noticias.findIndex(n => n.id === editandoId);
+                    noticias[index] = noticia;
+                } else {
+                    // Adiciona nova
+                    noticias.unshift(noticia);
+                }
+
+                // Salva no KV
+                const response = await fetch('/api/noticias', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ noticias })
+                });
+
+                if (!response.ok) throw new Error('Erro ao salvar');
+
+                mostrarStatus('✅ Notícia salva com sucesso!', 'success');
+                fecharModal();
+                renderizarNoticias();
+
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarStatus('❌ Erro ao salvar notícia.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> Salvar Notícia';
+            }
+        }
+
+        async function deletarNoticia(id) {
+            if (!confirm('Tem certeza que deseja excluir esta notícia?')) return;
+
+            try {
+                noticias = noticias.filter(n => n.id !== id);
+
+                const response = await fetch('/api/noticias', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ noticias })
+                });
+
+                if (!response.ok) throw new Error('Erro ao deletar');
+
+                mostrarStatus('✅ Notícia excluída com sucesso!', 'success');
+                renderizarNoticias();
+
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarStatus('❌ Erro ao excluir notícia.', 'error');
+            }
+        }
+
+        function mostrarStatus(mensagem, tipo) {
+            const status = document.getElementById('status');
+            status.textContent = mensagem;
+            status.className = `status ${tipo}`;
+            status.style.display = 'block';
+            setTimeout(() => status.style.display = 'none', 5000);
+        }
+    </script>
+</body>
+</html>
