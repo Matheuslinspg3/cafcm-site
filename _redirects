@@ -1,0 +1,5 @@
+// Cloudflare Pages redirects
+// https://developers.cloudflare.com/pages/configuration/redirects/
+
+/dev /dev.html 200
+/admin /dev.html 200
