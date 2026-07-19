@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAFCM - CMS Completo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        h1 {
+            color: #1a5490;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            color: #666;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            color: #1a5490;
+            border-bottom-color: #1a5490;
+        }
+
+        .tab:hover {
+            color: #1a5490;
+            background: #f8f9fa;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #1a5490;
+        }
+
+        .section h2 {
+            color: #1a5490;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #1a5490;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .btn {
+            background: #1a5490;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #144070;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .status {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-input {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 10px;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-cog"></i>
+                CMS CAFCM - Editor Completo
+            </h1>
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <!-- Abas -->
+        <div class="tabs">
+            <button class="tab active" onclick="mudarAba('hero')">
+                <i class="fas fa-home"></i> Hero
+            </button>
+            <button class="tab" onclick="mudarAba('quemsomos')">
+                <i class="fas fa-landmark"></i> Quem Somos
+            </button>
+            <button class="tab" onclick="mudarAba('stats')">
+                <i class="fas fa-chart-bar"></i> Números
+            </button>
+            <button class="tab" onclick="mudarAba('cursos')">
+                <i class="fas fa-graduation-cap"></i> Cursos
+            </button>
+            <button class="tab" onclick="mudarAba('jovemaprendiz')">
+                <i class="fas fa-user-graduate"></i> Jovem Aprendiz
+            </button>
+            <button class="tab" onclick="mudarAba('empresas')">
+                <i class="fas fa-building"></i> Empresas
+            </button>
+        </div>
+
+        <!-- Conteúdo das Abas -->
+        <div id="hero" class="tab-content active">
+            <div class="section">
+                <h2>Seção Hero (Topo da Página)</h2>
+
+                <div class="form-group">
+                    <label>Título - Linha 1</label>
+                    <input type="text" id="hero_titulo1" placeholder="TRANSFORMANDO VIDAS,">
+                </div>
+
+                <div class="form-group">
+                    <label>Título - Linha 2 (Destaque)</label>
+                    <input type="text" id="hero_titulo2" placeholder="CONSTRUINDO">
+                </div>
+
+                <div class="form-group">
+                    <label>Título - Linha 3</label>
+                    <input type="text" id="hero_titulo3" placeholder="O FUTURO.">
+                </div>
+
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea id="hero_descricao" rows="3">Há mais de 40 anos, a CAFCM promove educação, qualificação profissional e inclusão social para jovens e adolescentes...</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>URL da Imagem</label>
+                    <input type="url" id="hero_imagem" placeholder="images/hero-team.jpg">
+                    <div class="help-text">Cole a URL completa da imagem</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="quemsomos" class="tab-content">
+            <div class="section">
+                <h2>Seção Quem Somos / Institucional</h2>
+
+                <div class="form-group">
+                    <label>Label Superior</label>
+                    <input type="text" id="quem_label" placeholder="QUEM SOMOS">
+                </div>
+
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" id="quem_titulo" placeholder="Transformando histórias há mais de 40 anos">
+                </div>
+
+                <div class="form-group">
+                    <label>Subtítulo</label>
+                    <textarea id="quem_subtitulo" rows="2">Atuamos na Baixada Santista gerando oportunidades...</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Nossa Missão - Título</label>
+                    <input type="text" id="missao_titulo" placeholder="Nossa Missão">
+                </div>
+
+                <div class="form-group">
+                    <label>Nossa Missão - Texto</label>
+                    <textarea id="missao_texto" rows="3">Promover a educação, formação profissional e inclusão social...</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Nossos Valores - Título</label>
+                    <input type="text" id="valores_titulo" placeholder="Nossos Valores">
+                </div>
+
+                <div class="form-group">
+                    <label>Nossos Valores - Texto</label>
+                    <textarea id="valores_texto" rows="4">Compromisso Social, Excelência, Ética e Transparência...</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div id="stats" class="tab-content">
+            <div class="section">
+                <h2>Números / Estatísticas</h2>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Número 1</label>
+                        <div class="stat-input">
+                            <input type="text" id="stat1_numero" placeholder="+40">
+                            <input type="text" id="stat1_texto" placeholder="anos transformando vidas">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Número 2</label>
+                        <div class="stat-input">
+                            <input type="text" id="stat2_numero" placeholder="+15 mil">
+                            <input type="text" id="stat2_texto" placeholder="jovens formados">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Número 3</label>
+                        <div class="stat-input">
+                            <input type="text" id="stat3_numero" placeholder="+300">
+                            <input type="text" id="stat3_texto" placeholder="empresas parceiras">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Número 4</label>
+                        <div class="stat-input">
+                            <input type="text" id="stat4_numero" placeholder="4">
+                            <input type="text" id="stat4_texto" placeholder="unidades na Baixada">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cursos" class="tab-content">
+            <div class="section">
+                <h2>Seção Cursos</h2>
+
+                <div class="form-group">
+                    <label>Label Superior</label>
+                    <input type="text" id="cursos_label" placeholder="EDUCAÇÃO">
+                </div>
+
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" id="cursos_titulo" placeholder="Cursos e Formação Profissional">
+                </div>
+
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea id="cursos_descricao" rows="2">Oferecemos cursos de aprendizagem e qualificação profissional...</textarea>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Curso 1 - Administrativo</h2>
+                <div class="form-group">
+                    <label>Ícone (Font Awesome)</label>
+                    <input type="text" id="curso1_icone" placeholder="fa-briefcase">
+                    <div class="help-text">Ex: fa-briefcase, fa-chart-line, fa-tools</div>
+                </div>
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" id="curso1_titulo" placeholder="Administrativo">
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea id="curso1_descricao" rows="2">Formação completa em rotinas administrativas...</textarea>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Curso 2 - Vendas e Atendimento</h2>
+                <div class="form-group">
+                    <label>Ícone (Font Awesome)</label>
+                    <input type="text" id="curso2_icone" placeholder="fa-chart-line">
+                </div>
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" id="curso2_titulo" placeholder="Vendas e Atendimento">
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea id="curso2_descricao" rows="2">Técnicas de vendas, relacionamento com clientes...</textarea>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Curso 3 - Logística</h2>
+                <div class="form-group">
+                    <label>Ícone (Font Awesome)</label>
+                    <input type="text" id="curso3_icone" placeholder="fa-tools">
+                </div>
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" id="curso3_titulo" placeholder="Logística">
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea id="curso3_descricao" rows="2">Gestão de estoques, armazenamento...</textarea>
+                </div>
+            </div>
+
+            <!-- Mais cursos podem ser adicionados aqui -->
+        </div>
+
+        <div id="jovemaprendiz" class="tab-content">
+            <div class="section">
+                <h2>Seção Jovem Aprendiz</h2>
+
+                <div class="form-group">
+                    <label>Label Superior</label>
+                    <input type="text" id="ja_label" placeholder="OPORTUNIDADES">
+                </div>
+
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" id="ja_titulo" placeholder="Programa Jovem Aprendiz">
+                </div>
+
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea id="ja_descricao" rows="3">Aprenda, cresça e transforme seu futuro com a CAFCM...</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div id="empresas" class="tab-content">
+            <div class="section">
+                <h2>Seção Empresas</h2>
+
+                <div class="form-group">
+                    <label>Label Superior</label>
+                    <input type="text" id="emp_label" placeholder="PARCERIAS">
+                </div>
+
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" id="emp_titulo" placeholder="Empresas: Contrate Aprendizes">
+                </div>
+
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea id="emp_descricao" rows="3">Fortaleça sua empresa com propósito social...</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botões -->
+        <div class="btn-group">
+            <button class="btn btn-success" onclick="salvarTudo()">
+                <i class="fas fa-save"></i>
+                Salvar Todas as Alterações
+            </button>
+            <button class="btn" onclick="carregarTudo()">
+                <i class="fas fa-sync"></i>
+                Recarregar Dados
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Carrega ao iniciar
+        window.addEventListener('DOMContentLoaded', carregarTudo);
+
+        function mudarAba(abaId) {
+            // Remove active de todas
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            // Ativa a selecionada
+            event.target.classList.add('active');
+            document.getElementById(abaId).classList.add('active');
+        }
+
+        async function carregarTudo() {
+            mostrarStatus('Carregando dados...', 'info');
+
+            try {
+                const response = await fetch('/api/cms');
+                if (!response.ok) throw new Error('Erro ao carregar');
+
+                const data = await response.json();
+
+                // Preenche todos os campos
+                Object.keys(data).forEach(key => {
+                    const el = document.getElementById(key);
+                    if (el) el.value = data[key] || '';
+                });
+
+                mostrarStatus('✅ Dados carregados com sucesso!', 'success');
+                setTimeout(() => esconderStatus(), 3000);
+
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarStatus('⚠️ Usando dados padrão', 'info');
+                setTimeout(() => esconderStatus(), 3000);
+            }
+        }
+
+        async function salvarTudo() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+
+            mostrarStatus('Salvando todas as alterações...', 'info');
+
+            try {
+                // Coleta TODOS os campos
+                const data = {};
+                document.querySelectorAll('input, textarea, select').forEach(el => {
+                    if (el.id) data[el.id] = el.value;
+                });
+
+                const response = await fetch('/api/cms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) throw new Error('Erro ao salvar');
+
+                mostrarStatus('✅ Tudo salvo com sucesso! Site atualizado.', 'success');
+
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarStatus('❌ Erro ao salvar. Verifique se está online.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> Salvar Todas as Alterações';
+            }
+        }
+
+        function mostrarStatus(mensagem, tipo) {
+            const status = document.getElementById('status');
+            status.textContent = mensagem;
+            status.className = `status ${tipo}`;
+            status.style.display = 'block';
+        }
+
+        function esconderStatus() {
+            document.getElementById('status').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
